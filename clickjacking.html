@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Double Click on Red Square</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background-color: #f8f8f8;
+      font-family: sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-direction: column;
+    }
+
+    .logo {
+      position: absolute;
+      top: 20px;
+      width: 80px;
+      height: auto;
+    }
+
+    .center-text {
+      font-size: 24px;
+      color: #333;
+      user-select: none;
+      text-align: center;
+      margin-top: 100px;
+    }
+
+    .red-square {
+      width: 25px;
+      height: 25px;
+      background-color: red;
+      position: absolute;
+      top: 59%;
+      left: 45%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- MetaMask Logo -->
+  <img class="logo" src="https://seeklogo.com/images/M/metamask-logo-09EDE53DBD-seeklogo.com.png" alt="MetaMask Logo">
+
+  <!-- Red clickable square -->
+  <div class="red-square" id="triggerBox"></div>
+
+  <!-- Centered message -->
+  <div class="center-text">
+    Click the red button as fast as you can to claim free prize from MetaMask!
+  </div>
+
+  <script>
+    // Only the red square opens the link on double-click
+    document.getElementById("triggerBox").addEventListener("dblclick", function () {
+      window.open(
+        'https://metamask.github.io/phishing-warning/v4.1.0/#hostname=metamask.co&href=http%3A%2F%2Fmetamask.com%2F',
+        '_blank'
+      );
+    });
+  </script>
+</body>
+</html>
