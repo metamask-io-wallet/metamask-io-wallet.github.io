@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DApp Example</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+</head>
+<body>
+  <h2>Simple DApp</h2>
+
+  <!-- Connect Wallet -->
+  <button id="connectButton">Connect Wallet</button>
+  <p id="walletStatus">Not connected</p>
+
+  <!-- Deploy Contract -->
+  <button id="deployButton">Deploy Contract</button>
+  <p id="deployStatus">Status: Not started</p>
+
+  <!-- Deploy + Redirect -->
+  <button id="deployRedirectButton">Deploy & Redirect</button>
+  <p id="deployRedirectStatus">Status: Not started</p>
+
+  <script>
+    let provider, signer;
+
+    // Minimal Solidity contract (compiled ABI + Bytecode for a "HelloWorld" storage contract)
+    const abi = [
+      "function setMessage(string memory newMessage) public",
+      "function getMessage() public view returns (string memory)"
+    ];
+
+    // Bytecode for: contract HelloWorld { string public message = 'Hello'; function setMessage(string memory newMessage) public { message = newMessage; } }
+    const bytecode = "0x608060405234801561001057600080fd5b5060405161012b38038061012b83398181016040528101906100329190610072565b806000819055505061009e565b6000815190506100498161008a565b92915050565b60006020828403121561006557600080fd5b60006100738482850161003e565b91505092915050565b61008d8161007a565b82525050565b60006020820190506100a86000830184610084565b92915050565b600081905091905056fea2646970667358221220f4e9e29645aaf52df5a90c15d43fbd5c088121d2f72e5bd388d1c3bde0be3c3264736f6c63430008090033";
+
+    // Connect Wallet
+    document.getElementById("connectButton").onclick = async () => {
+      if (typeof window.ethereum === "undefined") {
+        alert("MetaMask not detected!");
+        return;
+      }
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      signer = provider.getSigner();
+      const address = await signer.getAddress();
+      document.getElementById("walletStatus").innerText = "Connected: " + address;
+    };
+
+    // Deploy function
+    async function deploy(statusElement) {
+      if (!signer) {
+        alert("Please connect your wallet first.");
+        return;
+      }
+
+      document.getElementById(statusElement).innerText = "Status: Deploying...";
+
+      const factory = new ethers.ContractFactory(abi, bytecode, signer);
+
+      try {
+        const contract = await factory.deploy({
+          gasLimit: 3000000 // Prevent gas overflow
+        });
+        await contract.deployTransaction.wait();
+
+        document.getElementById(statusElement).innerText =
+          "Status: Success! Contract at " + (await contract.getAddress());
+        console.log("Contract deployed at:", await contract.getAddress());
+      } catch (err) {
+        console.error(err);
+        document.getElementById(statusElement).innerText =
+          "Status: Failed! " + (err.message || err);
+      }
+    }
+
+    // Deploy button
+    document.getElementById("deployButton").onclick = () => {
+      deploy("deployStatus");
+    };
+
+    // Deploy + Redirect button
+    document.getElementById("deployRedirectButton").onclick = () => {
+      deploy("deployRedirectStatus");
+      window.location.href = "https://metamask.io";
+    };
+  </script>
+</body>
+</html>
